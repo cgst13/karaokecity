@@ -2,7 +2,7 @@
   "name": "client",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://cgst13.github.io/karaokecity",
+  "homepage": "https://karaokecity.greycoding.online",
   "type": "module",
   "scripts": {
     "dev": "vite",
