@@ -1,8 +1,16 @@
 import React, { useRef, useEffect, useState } from 'react';
 import YouTube from 'react-youtube';
 
-const VideoPlayer = ({ video, onEnd, onError, hasQueue }) => {
+const VideoPlayer = ({ video, onEnd, onError, hasQueue, clientId, activeDeviceId, onBecomeActive }) => {
   const [lastVideo, setLastVideo] = useState(null);
+  const [player, setPlayer] = useState(null);
+
+  // Check if this device is the active one. 
+  // If activeDeviceId is null (no one claimed it yet), we treat the first one to load as potential, 
+  // but better to default to passive to prevent race conditions, unless user clicks play.
+  // However, for smooth UX, if I started the queue, I should probably be active.
+  // For now, strict mode: only active if match.
+  const isActive = clientId === activeDeviceId;
 
   useEffect(() => {
     if (video) {
@@ -10,11 +18,34 @@ const VideoPlayer = ({ video, onEnd, onError, hasQueue }) => {
     }
   }, [video]);
 
+  // Sync pause state
+  useEffect(() => {
+    if (player && !isActive) {
+       // If we are not active, ensure we are paused
+       // But we only want to enforce this if the video is actually playing?
+       // Actually, calling pauseVideo() is safe even if already paused.
+       player.pauseVideo();
+    }
+  }, [isActive, player]);
+
+  const onPlayerReady = (event) => {
+    setPlayer(event.target);
+    if (!isActive) {
+      event.target.pauseVideo();
+    }
+  };
+
+  const onPlay = () => {
+    if (!isActive && onBecomeActive) {
+      onBecomeActive();
+    }
+  };
+
   const opts = {
     height: '100%',
     width: '100%',
     playerVars: {
-      autoplay: 1,
+      autoplay: isActive ? 1 : 0, // Only autoplay if we are the active device
       modestbranding: 1,
       rel: 0,
     },
