@@ -69,16 +69,21 @@ const VideoPlayer = ({ video, onEnd, onError, hasQueue, clientId, activeDeviceId
   // Ensure video plays when it changes (if active)
   useEffect(() => {
     if (isActive && player && video?.id?.videoId) {
-       try {
-         // Check if player is available and not already playing/buffering
-         // 1 = playing, 3 = buffering
-         const state = typeof player.getPlayerState === 'function' ? player.getPlayerState() : -1;
-         if (state !== 1 && state !== 3 && typeof player.playVideo === 'function') {
-           player.playVideo();
+       // Small delay to ensure player is ready to accept commands
+       const timer = setTimeout(() => {
+         try {
+           // Check if player is available and not already playing/buffering
+           // 1 = playing, 3 = buffering
+           const state = typeof player.getPlayerState === 'function' ? player.getPlayerState() : -1;
+           if (state !== 1 && state !== 3 && typeof player.playVideo === 'function') {
+             console.log("Force playing video via effect:", video.id.videoId);
+             player.playVideo();
+           }
+         } catch (error) {
+           console.warn("Auto-play error:", error);
          }
-       } catch (error) {
-         console.warn("Auto-play error:", error);
-       }
+       }, 500);
+       return () => clearTimeout(timer);
     }
   }, [video?.id?.videoId, isActive, player]);
 
@@ -111,6 +116,7 @@ const VideoPlayer = ({ video, onEnd, onError, hasQueue, clientId, activeDeviceId
       {videoToDisplay ? (
         <>
           <YouTube
+            key={videoToDisplay.id.videoId} // Force remount to ensure clean state for each video
             videoId={videoToDisplay.id.videoId}
             opts={opts}
             onEnd={onEnd}
