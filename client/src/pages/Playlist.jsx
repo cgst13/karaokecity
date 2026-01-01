@@ -17,6 +17,10 @@ function Playlist() {
   const [isTvMode, setIsTvMode] = useState(false);
   const [error, setError] = useState(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  
+  // Client ID for exclusive playback
+  const [clientId] = useState(() => Math.random().toString(36).substring(2, 15));
+  const [activeDeviceId, setActiveDeviceId] = useState(null);
 
   // Initial Fetch & Real-time Subscription
   useEffect(() => {
@@ -24,7 +28,8 @@ function Playlist() {
 
     fetchState();
 
-    const subscription = supabase
+    // Subscribe to Queue changes
+    const queueSubscription = supabase
       .channel(`karaoke_queue_${playlistId}`)
       .on('postgres_changes', { 
         event: '*', 
@@ -36,12 +41,39 @@ function Playlist() {
       })
       .subscribe();
 
+    // Subscribe to Playlist changes (for active device)
+    const playlistSubscription = supabase
+      .channel(`playlist_meta_${playlistId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'playlists',
+        filter: `id=eq.${playlistId}`
+      }, (payload) => {
+        if (payload.new.active_device_id) {
+          setActiveDeviceId(payload.new.active_device_id);
+        }
+      })
+      .subscribe();
+
     return () => {
-      subscription.unsubscribe();
+      queueSubscription.unsubscribe();
+      playlistSubscription.unsubscribe();
     };
   }, [playlistId]);
 
   const fetchState = async () => {
+    // Fetch playlist meta for active device
+    const { data: playlistData } = await supabase
+      .from('playlists')
+      .select('active_device_id')
+      .eq('id', playlistId)
+      .single();
+    
+    if (playlistData) {
+      setActiveDeviceId(playlistData.active_device_id);
+    }
+
     // Fetch currently playing
     const { data: playingData } = await supabase
       .from('karaoke_queue')
@@ -262,6 +294,9 @@ function Playlist() {
                  onEnd={handleVideoEnd}
                  onError={() => console.error("Video Error")}
                  hasQueue={queue.length > 0}
+                 clientId={clientId}
+                 activeDeviceId={activeDeviceId}
+                 onBecomeActive={handleBecomeActiveDevice}
                />
                
                {/* Queue Section */}

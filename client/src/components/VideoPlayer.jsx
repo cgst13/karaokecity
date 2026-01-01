@@ -45,6 +45,8 @@ const VideoPlayer = ({ video, onEnd, onError, hasQueue }) => {
         opts={opts}
         onEnd={onEnd}
         onError={onError}
+        onReady={onPlayerReady}
+        onPlay={onPlay}
         className="absolute inset-0 w-full h-full"
         iframeClassName="w-full h-full"
       />
