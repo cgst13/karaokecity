@@ -60,8 +60,27 @@ const VideoPlayer = ({ video, onEnd, onError, hasQueue, clientId, activeDeviceId
     setPlayer(event.target);
     if (!isActive) {
       event.target.pauseVideo();
+    } else {
+      // Force play if active (helps with autoplay policies)
+      event.target.playVideo();
     }
   };
+
+  // Ensure video plays when it changes (if active)
+  useEffect(() => {
+    if (isActive && player && video?.id?.videoId) {
+       try {
+         // Check if player is available and not already playing/buffering
+         // 1 = playing, 3 = buffering
+         const state = typeof player.getPlayerState === 'function' ? player.getPlayerState() : -1;
+         if (state !== 1 && state !== 3 && typeof player.playVideo === 'function') {
+           player.playVideo();
+         }
+       } catch (error) {
+         console.warn("Auto-play error:", error);
+       }
+    }
+  }, [video?.id?.videoId, isActive, player]);
 
   const onPlay = () => {
     if (!isActive && onBecomeActive) {
