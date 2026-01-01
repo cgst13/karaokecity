@@ -220,6 +220,24 @@ function Playlist() {
       .eq('id', videoToPlay.db_id);
   };
 
+  const handleBecomeActiveDevice = async () => {
+    if (!playlistId || !clientId) return;
+
+    try {
+      const { error } = await supabase
+        .from('playlists')
+        .update({ active_device_id: clientId })
+        .eq('id', playlistId);
+
+      if (error) throw error;
+      
+      // Optimistically update local state
+      setActiveDeviceId(clientId);
+    } catch (err) {
+      console.error('Error setting active device:', err);
+    }
+  };
+
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopySuccess(true);
