@@ -86,6 +86,7 @@ function Playlist() {
             maxResults: 20,
             q: query,
             type: 'video',
+            videoEmbeddable: 'true',
             key: apiKey
           }
         });
