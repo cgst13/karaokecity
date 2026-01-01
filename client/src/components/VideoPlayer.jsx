@@ -20,11 +20,14 @@ const VideoPlayer = ({ video, onEnd, onError, hasQueue, clientId, activeDeviceId
 
   // Sync pause state
   useEffect(() => {
-    if (player && !isActive) {
-       // If we are not active, ensure we are paused
-       // But we only want to enforce this if the video is actually playing?
-       // Actually, calling pauseVideo() is safe even if already paused.
-       player.pauseVideo();
+    // Wrap in a try-catch to prevent "Cannot read properties of null (reading 'src')"
+    // caused by YouTube iframe API internal issues when component unmounts or player state changes rapidly.
+    try {
+      if (player && typeof player.pauseVideo === 'function' && !isActive) {
+         player.pauseVideo();
+      }
+    } catch (error) {
+      console.warn("YouTube Player Error (safe to ignore):", error);
     }
   }, [isActive, player]);
 
