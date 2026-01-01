@@ -81,7 +81,7 @@ function Playlist() {
       .eq('playlist_id', playlistId)
       .eq('status', 'playing')
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (playingData) {
       setCurrentVideo({ ...playingData.video_data, db_id: playingData.id });
