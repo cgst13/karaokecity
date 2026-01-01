@@ -1,7 +1,15 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import YouTube from 'react-youtube';
 
-const VideoPlayer = ({ video, onEnd, onError }) => {
+const VideoPlayer = ({ video, onEnd, onError, hasQueue }) => {
+  const [lastVideo, setLastVideo] = useState(null);
+
+  useEffect(() => {
+    if (video) {
+      setLastVideo(video);
+    }
+  }, [video]);
+
   const opts = {
     height: '100%',
     width: '100%',
@@ -12,7 +20,11 @@ const VideoPlayer = ({ video, onEnd, onError }) => {
     },
   };
 
-  if (!video) {
+  // If no current video, but we have items in queue or a last video was playing,
+  // keep the last video mounted to prevent full-screen exit during transition.
+  const videoToDisplay = video || (hasQueue ? lastVideo : null);
+
+  if (!videoToDisplay) {
     return (
       <div className="w-full aspect-video bg-gray-900 rounded-xl flex items-center justify-center text-white shadow-inner">
         <div className="text-center p-6">
@@ -29,7 +41,7 @@ const VideoPlayer = ({ video, onEnd, onError }) => {
   return (
     <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-lg relative ring-1 ring-black/10">
       <YouTube
-        videoId={video.id.videoId}
+        videoId={videoToDisplay.id.videoId}
         opts={opts}
         onEnd={onEnd}
         onError={onError}

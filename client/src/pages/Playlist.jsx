@@ -261,6 +261,7 @@ function Playlist() {
                  video={currentVideo} 
                  onEnd={handleVideoEnd}
                  onError={() => console.error("Video Error")}
+                 hasQueue={queue.length > 0}
                />
                
                {/* Queue Section */}
