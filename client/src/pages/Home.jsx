@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
+import { api } from '../api/client';
 import { FaMusic } from 'react-icons/fa';
+import Toast from '../components/Toast';
 
 function Home() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   const createPlaylist = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('playlists')
-        .insert([{}]) // default values
-        .select()
-        .single();
-
-      if (error) throw error;
+      const data = await api.createPlaylist();
       
-      if (data) {
+      if (data && data.id) {
         navigate(`/playlist/${data.id}`);
       }
     } catch (error) {
       console.error('Error creating playlist:', error);
-      alert('Failed to create playlist');
+      setToast({ message: 'Failed to create playlist. Please try again.', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -36,7 +32,7 @@ function Home() {
           <FaMusic className="text-6xl text-blue-400 animate-bounce" />
         </div>
         <h1 className="text-5xl font-bold tracking-tight">
-          Karaoke<span className="text-blue-400">Queue</span>
+          Grey<span className="text-blue-400">Karaoke</span>
         </h1>
         <p className="text-gray-300 text-lg">
           Create a collaborative playlist, share the link, and sing your heart out!
@@ -50,6 +46,13 @@ function Home() {
           {loading ? 'Creating...' : 'Create New Playlist'}
         </button>
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

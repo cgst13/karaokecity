@@ -1,4 +1,4 @@
-# Karaoke Queue Player
+# GreyKaraoke
 
 A modern, responsive React application for queuing and playing YouTube videos, perfect for Karaoke sessions or shared music queues.
 
@@ -16,11 +16,16 @@ A modern, responsive React application for queuing and playing YouTube videos, p
    - Create a new project.
    - Enable the **YouTube Data API v3**.
    - Create credentials (API Key).
+3. **Google Service Account (for Sheets)**:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Enable the **Google Sheets API**.
+   - Create a Service Account and download the JSON key.
+   - Share your Google Sheet with the Service Account email (Editor access).
 
 ## Setup Instructions
 
 ### 1. Backend Setup (Server)
-The backend proxies requests to YouTube to keep your API key secure.
+The backend proxies requests to YouTube and manages the Google Sheet database.
 
 1. Navigate to the `server` directory:
    ```bash
@@ -33,6 +38,9 @@ The backend proxies requests to YouTube to keep your API key secure.
 3. Create a `.env` file based on `.env.example`:
    - Open `.env`
    - Add your YouTube API Key: `YOUTUBE_API_KEY=your_key_here`
+   - Add your Google Sheet ID: `GOOGLE_SHEET_ID=your_sheet_id`
+   - Add your Service Account Email: `GOOGLE_SERVICE_ACCOUNT_EMAIL=...`
+   - Add your Private Key: `GOOGLE_PRIVATE_KEY=...`
 4. Start the server:
    ```bash
    npm start

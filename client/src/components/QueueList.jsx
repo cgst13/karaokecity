@@ -1,11 +1,66 @@
 import React from 'react';
-import { FaTrash, FaPlay, FaGripVertical } from 'react-icons/fa';
+import { FaTrash, FaPlay, FaGripVertical, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
-const QueueList = ({ queue, currentVideo, onRemove, onPlayNow }) => {
+const QueueList = ({ queue, currentVideo, onRemove, onPlayNow, onMoveUp, onMoveDown, minimal = false }) => {
   if (queue.length === 0 && !currentVideo) {
+    if (minimal) return null;
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
         <p className="text-gray-500">Queue is empty. Add some videos!</p>
+      </div>
+    );
+  }
+
+  if (minimal) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
+        <div className="p-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="font-bold text-sm text-gray-800">Queue ({queue.length})</h2>
+          {currentVideo && (
+            <span className="text-xs text-blue-600 font-medium truncate max-w-[200px]">
+              Now: {currentVideo.snippet.title}
+            </span>
+          )}
+        </div>
+        
+        <div className="max-h-[150px] overflow-y-auto p-2 space-y-1">
+          {queue.map((video, index) => (
+            <div 
+              key={`${video.id.videoId}-${index}`}
+              className="flex items-center justify-between gap-2 p-1.5 hover:bg-gray-50 rounded text-sm group"
+            >
+              <div 
+                className="flex-1 truncate cursor-pointer text-gray-700 hover:text-blue-600"
+                onClick={() => onPlayNow(index)}
+              >
+                <span className="font-medium text-xs mr-2 text-gray-400">{index + 1}.</span>
+                {video.snippet.title}
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onMoveUp(index)}
+                  disabled={index === 0}
+                  className={`text-gray-400 p-1 ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-500'}`}
+                >
+                  <FaArrowUp size={10} />
+                </button>
+                <button
+                  onClick={() => onMoveDown(index)}
+                  disabled={index === queue.length - 1}
+                  className={`text-gray-400 p-1 ${index === queue.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-500'}`}
+                >
+                  <FaArrowDown size={10} />
+                </button>
+                <button
+                  onClick={() => onRemove(index)}
+                  className="text-gray-400 hover:text-red-500 p-1"
+                >
+                  <FaTrash size={10} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -47,8 +102,21 @@ const QueueList = ({ queue, currentVideo, onRemove, onPlayNow }) => {
             key={`${video.id.videoId}-${index}`}
             className="group flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-200"
           >
-            <div className="text-gray-300 cursor-move opacity-0 group-hover:opacity-100 transition-opacity">
-              <FaGripVertical />
+            <div className="flex flex-col gap-1">
+               <button
+                  onClick={() => onMoveUp(index)}
+                  disabled={index === 0}
+                  className={`text-gray-300 ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-500 cursor-pointer'}`}
+                >
+                  <FaArrowUp size={10} />
+                </button>
+                <button
+                  onClick={() => onMoveDown(index)}
+                  disabled={index === queue.length - 1}
+                  className={`text-gray-300 ${index === queue.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:text-blue-500 cursor-pointer'}`}
+                >
+                  <FaArrowDown size={10} />
+                </button>
             </div>
             <div className="w-24 flex-shrink-0 aspect-video rounded overflow-hidden relative cursor-pointer group/thumb" onClick={() => onPlayNow(index)}>
                <img 

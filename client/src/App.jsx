@@ -8,7 +8,9 @@ function App() {
   // This supports both 'cgst13.github.io/karaokecity' and 'custom-domain.com'
   const basename = window.location.pathname.startsWith('/karaokecity') 
     ? '/karaokecity' 
-    : '/';
+    : window.location.pathname.startsWith('/greykaraoke')
+      ? '/greykaraoke'
+      : '/';
 
   return (
     <Router basename={basename}>
