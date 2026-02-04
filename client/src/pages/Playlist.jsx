@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
 import { FaTv, FaDesktop, FaHome, FaShareAlt, FaThLarge, FaList } from 'react-icons/fa';
 import SearchBar from '../components/SearchBar';
@@ -104,11 +103,9 @@ function Playlist() {
         });
         items = response.data.items;
       } else {
-        // Fallback to local backend
-        const response = await axios.get(`http://localhost:5000/api/search`, {
-          params: { q: query }
-        });
-        items = response.data.items;
+        // Fallback to backend
+        const data = await api.search(query);
+        items = data.items;
       }
 
       setSearchResults(items || []);
