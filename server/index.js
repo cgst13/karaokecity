@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'https://karaoke.greycoding.online',
+    'https://karaokecity.greycoding.online',
     'http://localhost:5173',
     'http://localhost:5000'
   ],

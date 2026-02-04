@@ -2,7 +2,7 @@
   "name": "client",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://karaokecity.greycoding.online",
+  "homepage": "https://karaoke.greycoding.online",
   "type": "module",
   "scripts": {
     "dev": "vite",
